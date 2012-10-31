@@ -1,4 +1,4 @@
-joomla-content-plugin
+Joomla Content Plugin
 =====================
 
-The Content Plugin for Moolah E-Commerce
+The Joomla Content Plugin loads a Moolah E-Commerce store into your website.
