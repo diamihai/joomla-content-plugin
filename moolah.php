@@ -21,10 +21,6 @@ class plgContentMoolah extends JPlugin
     	
     	// Get plugin info
     	$plugin =& JPluginHelper::getPlugin('content', 'moolah');
-
-    	// define the regular expression for the bot
-    	$regex = "#{moolah(\s.*?)?}#s"; //(.*?)
-    	
     	$pluginParams = new JRegistry( $plugin->params );
 
     	// check whether plugin has been unpublished
@@ -34,15 +30,19 @@ class plgContentMoolah extends JPlugin
     	}
     	
     	// find all instances of plugin and put in $matches
+    	$regex = "#{moolah(.+)?}#s"; //(.*?)
     	preg_match_all( $regex, $article->text, $matches );
 
     	// Number of plugins
      	$count = count( $matches[0] );
 
      	// plugin only processes if there are any instances of the plugin in the text
-     	if ( $count ) {
-     		$this->plgContentProcessMoolahMatches( $article, $matches, $count, $regex, $pluginParams );
+     	if ( ! $count ) {
+    		$article->text = preg_replace( '#{moolah.*?}#', '<!-- No Moolah Code Detected -->', $article->text );
+    		return true;
     	}
+
+     	$this->plgContentProcessMoolahMatches( $article, $matches, $pluginParams );
 
 	}
 	
@@ -71,11 +71,9 @@ class plgContentMoolah extends JPlugin
 		$extjs		= $params->get('EXTJS_JS_LOCATION',"http://$site/extjs/");
 		$moolah		= $params->get('MOOLAH_JS_LOCATION',"http://$site/$storeId/js/");
 
-		$args		= "?target=$divId&store=$storeId";
+		$args		= "?target=$divId&store=$storeId&category=$categoryId&product=$productId";
 		
 		if ( $version )		$args .= "&ver=$version";
-		if ( $categoryId )	$args .= "&category=$categoryId";
-		if ( $productId )	$args .= "&product=$productId";
         if ( $siteId )      $args .= "&site=$siteId";
         if ( $affiliateId)  $args .= "&affiliate=$affiliateId";
 
@@ -110,13 +108,14 @@ class plgContentMoolah extends JPlugin
 	
 	}
 	
-	public function plgContentProcessMoolahMatches( &$row, &$matches, $count, $regex, $params )
+	public function plgContentProcessMoolahMatches( &$row, &$matches, $params )
 	{
-		for ( $i=0; $i < $count; $i++ )
+		$parts = preg_split('#\s#', trim($matches[1][0]) );
+		foreach ( $parts as $part )
 		{
-			if ( strpos($matches[1][$i],'='))
+			if ( strpos($part,'='))
 			{
-				list($k,$v) = explode('=',$matches[1][$i]);
+				list($k,$v) = explode('=',$part);
 				$k = strtoupper(trim($k)).'_ID';
 				$params->set($k,$v);
 			}
