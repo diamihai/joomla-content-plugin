@@ -117,6 +117,7 @@ class plgContentMoolah extends JPlugin
 			{
 				list($k,$v) = explode('=',$part);
 				$k = strtoupper(trim($k)).'_ID';
+				$v = trim($v);
 				$params->set($k,$v);
 			}
 		}
