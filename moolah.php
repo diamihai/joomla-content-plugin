@@ -51,11 +51,11 @@ class plgContentMoolah extends JPlugin
 	protected function addHeader($params)
 	{
         $doc		= JFactory::getDocument();
-        $app        = JFactory::getApplication();
+        $uri        = JFactory::getUri();
         $head		=& $doc->getHeadData();
         $scripts	=& $head['scripts'];
         $debug		= $params->get('TESTING',true) ? '-debug' : '';
-        $ssl        = $app->isSSLConnection();
+        $ssl        = $uri->isSSL();
         $proto      = $ssl ? 'https' : 'http';
 
         $local		= in_array($_SERVER['HTTP_HOST'], array('mec', 'mec-demo') );
