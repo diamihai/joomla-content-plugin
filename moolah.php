@@ -18,6 +18,8 @@ class plgContentMoolah extends JPlugin
     	if ( strpos( $article->text, 'moolah' ) === false ) {
     		return true;
     	}
+
+        $regex = "#{moolah(.+)?}#s"; //(.*?)
     	
     	// Get plugin info
     	$plugin =& JPluginHelper::getPlugin('content', 'moolah');
@@ -30,7 +32,7 @@ class plgContentMoolah extends JPlugin
     	}
     	
     	// find all instances of plugin and put in $matches
-    	$regex = "#{moolah(.+)?}#s"; //(.*?)
+
     	preg_match_all( $regex, $article->text, $matches );
 
     	// Number of plugins
@@ -48,28 +50,34 @@ class plgContentMoolah extends JPlugin
 	
 	protected function addHeader($params)
 	{
-		$doc		= JFactory::getDocument();
-		$head		=& $doc->getHeadData();
-		$scripts	=& $head['scripts'];
+        $doc		= JFactory::getDocument();
+        $app        = JFactory::getApplication();
+        $head		=& $doc->getHeadData();
+        $scripts	=& $head['scripts'];
         $debug		= $params->get('TESTING',true) ? '-debug' : '';
+        $ssl        = $app->isSSLConnection();
+        $proto      = $ssl ? 'https' : 'http';
 
-		$local		= in_array($_SERVER['HTTP_HOST'], array('mec', 'mec-demo') );
+        $local		= in_array($_SERVER['HTTP_HOST'], array('mec', 'mec-demo') );
 
         if ( $local ) {
-            $site = $debug ? 'mec-test' : 'mec-store';
+            $site   = $debug ? 'mec-test' : 'mec-store';
+            $cdn    = $site;
         } else {
-            $site = $debug ? 'test.moolah-ecommerce.com' : 'store.moolah-ecommerce.com';
+            $site   = $debug ? 'test.moolah-ecommerce.com' : 'store.moolah-ecommerce.com';
+            $cdn    = $ssl  ? '155505a11bc78ed47306-32388414bd35ec9b874e476acd7f793d.ssl.cf2.rackcdn.com'
+                            : '38c04c6c581cc52efe28-32388414bd35ec9b874e476acd7f793d.r45.cf2.rackcdn.com';
         }
 
-		$storeId	= $params->get('STORE_ID');
-		$productId	= $params->get('PRODUCT_ID');
-		$categoryId	= $params->get('CATEGORY_ID');
-        $siteId         = $params->get('SITE_ID');
-        $affiliateId    = $params->get('AFFILIATE_ID');
-		$divId		= $params->get('DIV_ID','moolah');
-		$version	= $params->get('VERSION');
-		$extjs		= $params->get('EXTJS_JS_LOCATION',"http://$site/extjs/");
-		$moolah		= $params->get('MOOLAH_JS_LOCATION',"http://$site/$storeId/js/");
+        $storeId	= $params->get('STORE_ID');
+        $productId	= $params->get('PRODUCT_ID');
+        $categoryId	= $params->get('CATEGORY_ID');
+        $siteId     = $params->get('SITE_ID');
+        $affiliateId= $params->get('AFFILIATE_ID');
+        $divId		= $params->get('DIV_ID','moolah');
+        $version	= $params->get('VERSION');
+        $extjs		= $params->get('EXTJS_JS_LOCATION',"$proto://$cdn/extjs/411a/");
+        $moolah		= $params->get('MOOLAH_JS_LOCATION',"$proto://$site/$storeId/js/");
 
 		$args		= "?target=$divId&store=$storeId&category=$categoryId&product=$productId";
 		
@@ -81,31 +89,31 @@ class plgContentMoolah extends JPlugin
 		// It helps if the ExtJS script is the first one in
 		$tmp = $extjs . "ext-all$debug.js";
 		$doc->setHeadData(array(
-					'scripts' => array( 
-							$tmp => array( 
-									'mime' => 'text/javascript', 
-									'defer' => false, 
+					'scripts' => array(
+							$tmp => array(
+									'mime' => 'text/javascript',
+									'defer' => false,
 									'async' => false
 									)
 							)
 					)
 			);
-		
+
 		// Add our Individual Scripts
 		foreach ( array('order.js','init.js') as $script )
 		{
 			$doc->addScript( $moolah . $script . $args );
 		}
-		
+
 		$doc->addStyleSheet( $extjs . 'themes/css/default.css' );
 		$doc->addStyleSheet( "http://$site/$storeId/css/order.css" );
-		
+
 		// Now add in again the scripts that we wiped
 		foreach($scripts as $s => $a)
 		{
 			$doc->addScript($s, $a['mime'], $a['defer'], $a['async']);
 		}
-	
+
 	}
 	
 	public function plgContentProcessMoolahMatches( &$row, &$matches, $params )
