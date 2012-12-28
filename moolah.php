@@ -106,7 +106,7 @@ class plgContentMoolah extends JPlugin
 		}
 
 		$doc->addStyleSheet( $extjs . 'themes/css/default.css' );
-		$doc->addStyleSheet( "http://$site/$storeId/css/order.css" );
+		$doc->addStyleSheet( $extjs . 'style/order.css' );
 
 		// Now add in again the scripts that we wiped
 		foreach($scripts as $s => $a)
