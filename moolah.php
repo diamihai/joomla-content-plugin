@@ -3,7 +3,7 @@
 /**
  * @Package Plugin Moolah E-Commerce Loader
  * @Author Moolah E-Commerce
- * @Copyright (C) 2012 Moolah E-Commerce
+ * @Copyright (C) 2012-2013 Moolah E-Commerce
  * @license GNU/GPLv2
  **/
 
@@ -14,7 +14,14 @@ class plgContentMoolah extends JPlugin
 {
     protected   $shouldAddheader    = false;
 
-	public function onContentPrepare($context, &$article, &$params, $page = 0)
+    /**
+     * @param $context
+     * @param $article
+     * @param $params
+     * @param int $page
+     * @return bool
+     */
+    public function onContentPrepare($context, &$article, &$params, $page = 0)
 	{
     	// simple performance check to determine whether bot should process further
     	if ( strpos( $article->text, 'moolah' ) === false ) {
@@ -50,13 +57,19 @@ class plgContentMoolah extends JPlugin
 
 	}
 
+    /**
+     * Add a header to the response
+     */
     public function onBeforeRender()
     {
         if ( $this->shouldAddHeader ) {
             $this->addHeader();
         }
     }
-	
+
+    /**
+     * Add a header to the response
+     */
 	protected function addHeader()
 	{
         $params     = $this->params;
@@ -72,11 +85,8 @@ class plgContentMoolah extends JPlugin
 
         if ( $local ) {
             $site   = $debug ? 'mec-test' : 'mec-store';
-            $cdn    = $site;
         } else {
             $site   = $debug ? 'test.moolah-ecommerce.com' : 'store.moolah-ecommerce.com';
-            $cdn    = $ssl  ? '155505a11bc78ed47306-32388414bd35ec9b874e476acd7f793d.ssl.cf2.rackcdn.com'
-                            : '38c04c6c581cc52efe28-32388414bd35ec9b874e476acd7f793d.r45.cf2.rackcdn.com';
         }
 
         $storeId	= $params->get('STORE_ID');
@@ -86,7 +96,6 @@ class plgContentMoolah extends JPlugin
         $affiliateId= $params->get('AFFILIATE_ID');
         $divId		= $params->get('DIV_ID','moolah');
         $version	= $params->get('VERSION');
-        $extjs		= $params->get('EXTJS_JS_LOCATION',"$proto://$cdn/extjs/411a/");
         $moolah		= $params->get('MOOLAH_JS_LOCATION',"$proto://$site/$storeId/js/");
 
 		$args		= "?target=$divId&store=$storeId&category=$categoryId&product=$productId";
@@ -95,40 +104,7 @@ class plgContentMoolah extends JPlugin
         if ( $siteId )      $args .= "&site=$siteId";
         if ( $affiliateId)  $args .= "&affiliate=$affiliateId";
 
-        if ( true ) {
-            $doc->addScript( $moolah . 'load.js' . $args );
-        } else {
-
-            //echo "category is $categoryId, product is $productId, store is $storeId<br/>";
-            // It helps if the ExtJS script is the first one in
-            $tmp = $extjs . "ext-all$debug.js";
-            $doc->setHeadData(
-                array(
-                    'scripts' => array(
-                        $tmp => array(
-                            'mime' => 'text/javascript',
-                            'defer' => false,
-                            'async' => false
-                            )
-                        )
-                    )
-                );
-
-            // Add our Individual Scripts
-            foreach ( array('order.js','init.js') as $script )
-            {
-                $doc->addScript( $moolah . $script . $args );
-            }
-
-            $doc->addStyleSheet( $extjs . 'themes/css/default.css' );
-            $doc->addStyleSheet( $extjs . 'style/order.css' );
-
-            // Now add in again the scripts that we wiped
-            foreach($scripts as $s => $a)
-            {
-                $doc->addScript($s, $a['mime'], $a['defer'], $a['async']);
-            }
-        }
+        $doc->addScript( $moolah . 'load.js' . $args );
 
 	}
 	
