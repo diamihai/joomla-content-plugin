@@ -12,6 +12,8 @@ defined('_JEXEC') or die;
 
 class plgContentMoolah extends JPlugin
 {
+    protected   $shouldAddheader    = false;
+
 	public function onContentPrepare($context, &$article, &$params, $page = 0)
 	{
     	// simple performance check to determine whether bot should process further
@@ -44,12 +46,20 @@ class plgContentMoolah extends JPlugin
     		return true;
     	}
 
-     	$this->plgContentProcessMoolahMatches( $article, $matches, $pluginParams );
+     	return $this->plgContentProcessMoolahMatches( $article, $matches, $pluginParams );
 
 	}
+
+    public function onBeforeRender()
+    {
+        if ( $this->shouldAddHeader ) {
+            $this->addHeader();
+        }
+    }
 	
-	protected function addHeader($params)
+	protected function addHeader()
 	{
+        $params     = $this->params;
         $doc		= JFactory::getDocument();
         $uri        = JFactory::getUri();
         $head		=& $doc->getHeadData();
@@ -85,34 +95,40 @@ class plgContentMoolah extends JPlugin
         if ( $siteId )      $args .= "&site=$siteId";
         if ( $affiliateId)  $args .= "&affiliate=$affiliateId";
 
-		//echo "category is $categoryId, product is $productId, store is $storeId<br/>";
-		// It helps if the ExtJS script is the first one in
-		$tmp = $extjs . "ext-all$debug.js";
-		$doc->setHeadData(array(
-					'scripts' => array(
-							$tmp => array(
-									'mime' => 'text/javascript',
-									'defer' => false,
-									'async' => false
-									)
-							)
-					)
-			);
+        if ( true ) {
+            $doc->addScript( $moolah . 'load.js' . $args );
+        } else {
 
-		// Add our Individual Scripts
-		foreach ( array('order.js','init.js') as $script )
-		{
-			$doc->addScript( $moolah . $script . $args );
-		}
+            //echo "category is $categoryId, product is $productId, store is $storeId<br/>";
+            // It helps if the ExtJS script is the first one in
+            $tmp = $extjs . "ext-all$debug.js";
+            $doc->setHeadData(
+                array(
+                    'scripts' => array(
+                        $tmp => array(
+                            'mime' => 'text/javascript',
+                            'defer' => false,
+                            'async' => false
+                            )
+                        )
+                    )
+                );
 
-		$doc->addStyleSheet( $extjs . 'themes/css/default.css' );
-		$doc->addStyleSheet( $extjs . 'style/order.css' );
+            // Add our Individual Scripts
+            foreach ( array('order.js','init.js') as $script )
+            {
+                $doc->addScript( $moolah . $script . $args );
+            }
 
-		// Now add in again the scripts that we wiped
-		foreach($scripts as $s => $a)
-		{
-			$doc->addScript($s, $a['mime'], $a['defer'], $a['async']);
-		}
+            $doc->addStyleSheet( $extjs . 'themes/css/default.css' );
+            $doc->addStyleSheet( $extjs . 'style/order.css' );
+
+            // Now add in again the scripts that we wiped
+            foreach($scripts as $s => $a)
+            {
+                $doc->addScript($s, $a['mime'], $a['defer'], $a['async']);
+            }
+        }
 
 	}
 	
@@ -132,11 +148,13 @@ class plgContentMoolah extends JPlugin
 		
 		$divId		= $params->get('DIV_ID','moolah');
 		$text		= '<div id="'.$divId.'">Moolah Store</div>';
-		
-		$this->addHeader($params);
+
+        $this->shouldAddHeader = true;
+
+		$this->params = $params;
 		
 		$row->text = str_replace( $matches[0][0], $text, $row->text );
 		
-
+        return true;
 	}
 }
