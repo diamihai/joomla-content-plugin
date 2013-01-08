@@ -98,7 +98,7 @@ class plgContentMoolah extends JPlugin
         $version	= $params->get('VERSION');
         $moolah		= $params->get('MOOLAH_JS_LOCATION',"$proto://$site/$storeId/js/");
 
-		$args		= "?target=$divId&store=$storeId&category=$categoryId&product=$productId";
+		$args		= "?target=$divId&store=$storeId&category=$categoryId&product=$productId&system=joomla";
 		
 		if ( $version )		$args .= "&ver=$version";
         if ( $siteId )      $args .= "&site=$siteId";
