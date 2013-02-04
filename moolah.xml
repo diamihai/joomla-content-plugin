@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" group="content" method="upgrade" >
+<extension version="2.5" type="plugin" group="content" method="upgrade" >
 	<name>plg_content_moolah</name>
 	<author>Moolah E-Commerce</author>
 	<creationDate>January 2013</creationDate>
@@ -8,7 +8,23 @@
 	<authorEmail>development@moolah-ecommerce.com</authorEmail>
 	<authorUrl>moolah-ecommerce.com</authorUrl>
 	<version>2.1.0</version>
-	<description>PLG_CONTENT_MOOLAH_XML_DESCRIPTION</description>
+    <description>
+        <![CDATA[
+        <div style="text-align:left;">
+            <img src="http://moolah-ecommerce.com/images/moolah/moolah128.png" style="float:right;padding:20px" />
+            <h1>Moolah E-Commerce</h1>
+            <p>Moolah provides a single-page, mobile-ready checkout for your website without needing to install any software.</p>
+            <h2>Key Features:</h2>
+            <ul class="features">
+                <li>Your store will load into the current page of your site, and each step of the check loads smoothly into the current page.</li>
+                <li>A Moolah store can adjust automatically to whatever device the customer is using, and works with as well with a 4" screen as it does with a 24" screen.</li>
+                <li>You can easily integrate Moolah into any website, including Joomla, Wordpress, or even a normal HTML webpage.</li>
+                <li>A store can be deployed to several sites at the same time, and are managed from one central location.</li>
+            </ul>
+            <p>Use the <a href="index.php?option=com_plugins&view=plugins&filter_search=moolah" title="Plugin Manager" >Joomla Plugin Manager</a> to enable the plugin.</p>
+        </div>
+        ]]>
+    </description>
 	<files>
 		<filename plugin="moolah">moolah.php</filename>
 		<filename>index.html</filename>
@@ -25,7 +41,7 @@
 			
 				<field name="STORE_ID" type="text" label="Store ID" size="32"
 					description="PLG_CONTENT_MOOLAH_STORE_ID_DESC"
-                    default=""
+                    default="2642953450"
 				/>
 				
 				<field name="CATEGORY_ID" type="text" label="Category ID" size="32"
@@ -43,7 +59,7 @@
                 />
 
                 <field name="TESTING" type="radio" label="Testing"
-                       default="0"
+                       default="1"
                        description="PLG_CONTENT_MOOLAH_TESTING_DESC"
                         >
                     <option value="0">No</option>
