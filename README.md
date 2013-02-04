@@ -7,7 +7,7 @@ Usage:
 Simply enable the plugin and insert the following code into your content article: {moolah}.
 
 Documentation:
-You find specific documentation for our plugin at http://moolah-ecommerce.com/help/guides/27-installation/50-using-moolah-with-joomla .
+You find specific documentation for our plugin at http://moolah-ecommerce.com/learn/deploy/50-creating-a-joomla-commerce-site .
 
 Listing:
 Our official listing with Joomla is http://extensions.joomla.org/extensions/e-commerce/e-commerce-integrations/22687 .
